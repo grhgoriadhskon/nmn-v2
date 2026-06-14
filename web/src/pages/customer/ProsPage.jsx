@@ -12,21 +12,21 @@ export default function ProsPage() {
   }, []);
 
   return (
-    <div style={s.page}>
+    <div className="nmn-page">
       <div style={s.header}>
         <h1 style={s.title}>Find a professional</h1>
-        <p style={s.sub}>Book beauty services with top local professionals</p>
+        <p style={s.sub}>Discover and book talented beauty professionals near you</p>
       </div>
 
       {loading ? (
-        <div style={s.loading}>Loading professionals…</div>
+        <p style={s.empty}>Loading…</p>
       ) : pros.length === 0 ? (
-        <div style={s.empty}>No professionals available yet.</div>
+        <p style={s.empty}>No professionals available yet.</p>
       ) : (
         <div style={s.grid}>
           {pros.map(pro => (
             <div key={pro.id} style={s.card} onClick={() => navigate(`/pros/${pro.id}`)}>
-              <div style={s.cardTop}>
+              <div style={s.cardInner}>
                 {pro.avatar_url
                   ? <img src={pro.avatar_url} alt={pro.name} style={s.avatarImg} />
                   : <div style={s.avatar}>{pro.name?.[0]?.toUpperCase()}</div>
@@ -34,10 +34,12 @@ export default function ProsPage() {
                 <div style={s.info}>
                   <p style={s.name}>{pro.name}</p>
                   {pro.city && <p style={s.city}>📍 {pro.city}</p>}
+                  {pro.bio  && <p style={s.bio}>{pro.bio}</p>}
                 </div>
               </div>
-              {pro.bio && <p style={s.bio}>{pro.bio}</p>}
-              <div style={s.cta}>Book now →</div>
+              <div style={s.cardFooter}>
+                <span style={s.bookBtn}>Book →</span>
+              </div>
             </div>
           ))}
         </div>
@@ -47,20 +49,19 @@ export default function ProsPage() {
 }
 
 const s = {
-  page:     { padding: '32px 24px', maxWidth: 960, margin: '0 auto' },
-  header:   { marginBottom: 32 },
-  title:    { fontSize: 28, fontWeight: 800, color: '#1a1a2e', marginBottom: 6 },
-  sub:      { fontSize: 15, color: '#888' },
-  loading:  { color: '#aaa', textAlign: 'center', padding: 48 },
-  empty:    { color: '#aaa', textAlign: 'center', padding: 48 },
-  grid:     { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 },
-  card:     { background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,.06)', cursor: 'pointer', transition: 'transform .15s, box-shadow .15s', border: '1px solid transparent' },
-  cardTop:  { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 },
-  avatarImg:{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 },
-  avatar:   { width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg, #6c47ff, #a855f7)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, flexShrink: 0 },
-  info:     { flex: 1, minWidth: 0 },
-  name:     { fontWeight: 700, fontSize: 16, color: '#1a1a2e', marginBottom: 2 },
-  city:     { fontSize: 13, color: '#888' },
-  bio:      { fontSize: 13, color: '#666', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 14 },
-  cta:      { fontSize: 13, fontWeight: 700, color: '#6c47ff' },
+  header:    { marginBottom: 36 },
+  title:     { fontFamily: 'var(--font-display)', fontSize: 40, fontWeight: 300, color: 'var(--ink)', marginBottom: 8 },
+  sub:       { fontSize: 15, color: 'var(--muted)' },
+  empty:     { color: 'var(--muted)', textAlign: 'center', padding: '60px 0' },
+  grid:      { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 },
+  card:      { background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow .2s, border-color .2s', boxShadow: 'var(--shadow-sm)' },
+  cardInner: { padding: '20px 20px 16px', display: 'flex', gap: 14, alignItems: 'flex-start' },
+  avatarImg: { width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid var(--stone)' },
+  avatar:    { width: 52, height: 52, borderRadius: '50%', background: 'var(--gold)', color: 'var(--white)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 600, flexShrink: 0 },
+  info:      { flex: 1, minWidth: 0 },
+  name:      { fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 600, color: 'var(--ink)', marginBottom: 2 },
+  city:      { fontSize: 13, color: 'var(--muted)', marginBottom: 6 },
+  bio:       { fontSize: 13, color: 'var(--ink-light)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' },
+  cardFooter:{ borderTop: '1px solid var(--stone)', padding: '12px 20px', display: 'flex', justifyContent: 'flex-end' },
+  bookBtn:   { fontSize: 13, fontWeight: 600, color: 'var(--gold-dark)', letterSpacing: '.04em', textTransform: 'uppercase' },
 };

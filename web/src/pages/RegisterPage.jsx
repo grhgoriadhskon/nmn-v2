@@ -5,30 +5,27 @@ import { useAuth } from '../context/AuthContext.jsx';
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate     = useNavigate();
-  const [fields, setFields] = useState({ name: '', email: '', password: '', role: 'customer' });
-  const [error, setError]   = useState('');
+  const [fields, setFields]   = useState({ name: '', email: '', password: '', role: 'customer' });
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const set = key => e => setFields(f => ({ ...f, [key]: e.target.value }));
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setError(''); setLoading(true);
     try {
       await register(fields);
       navigate('/');
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
   return (
     <div style={s.page}>
       <div style={s.card}>
-        <div style={s.brand}>💅 NMN</div>
+        <p style={s.brand}>NMN</p>
         <h1 style={s.title}>Create account</h1>
         <p style={s.sub}>Join as a customer or professional</p>
 
@@ -51,26 +48,31 @@ export default function RegisterPage() {
           <div style={s.field}>
             <label style={s.label}>I am a…</label>
             <div style={s.roleRow}>
-              {['customer', 'pro'].map(role => (
+              {[
+                { value: 'customer', label: 'Customer', desc: 'Book beauty services' },
+                { value: 'pro',      label: 'Professional', desc: 'Offer your services' },
+              ].map(r => (
                 <button
-                  key={role}
+                  key={r.value}
                   type="button"
-                  style={{ ...s.roleBtn, ...(fields.role === role ? s.roleBtnActive : {}) }}
-                  onClick={() => setFields(f => ({ ...f, role }))}
+                  style={{ ...s.roleBtn, ...(fields.role === r.value ? s.roleBtnActive : {}) }}
+                  onClick={() => setFields(f => ({ ...f, role: r.value }))}
                 >
-                  {role === 'customer' ? '🛍️ Customer' : '💅 Professional'}
+                  <span style={s.roleName}>{r.label}</span>
+                  <span style={s.roleDesc}>{r.desc}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          <button style={s.btn} type="submit" disabled={loading}>
+          <button style={{ ...s.btn, opacity: loading ? .7 : 1 }} type="submit" disabled={loading}>
             {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
         <p style={s.footer}>
-          Already have an account? <Link to="/login" style={s.link}>Sign in</Link>
+          Already have an account?{' '}
+          <Link to="/login" style={s.link}>Sign in</Link>
         </p>
       </div>
     </div>
@@ -78,19 +80,21 @@ export default function RegisterPage() {
 }
 
 const s = {
-  page:         { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)', padding: 20 },
-  card:         { width: '100%', maxWidth: 420, background: '#fff', borderRadius: 20, padding: '40px 36px', boxShadow: '0 20px 60px rgba(0,0,0,.15)' },
-  brand:        { fontSize: 28, fontWeight: 800, color: '#6c47ff', marginBottom: 24, letterSpacing: '-0.5px' },
-  title:        { fontSize: 24, fontWeight: 700, marginBottom: 4 },
-  sub:          { fontSize: 14, color: '#888', marginBottom: 28 },
-  field:        { marginBottom: 16 },
-  label:        { display: 'block', fontSize: 13, fontWeight: 600, color: '#444', marginBottom: 6 },
-  input:        { width: '100%', padding: '11px 14px', borderRadius: 10, border: '1.5px solid #e8e8e8', fontSize: 15 },
+  page:         { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--cream)', padding: 20 },
+  card:         { width: '100%', maxWidth: 420, background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 20, padding: '48px 40px', boxShadow: 'var(--shadow-lg)' },
+  brand:        { fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 600, color: 'var(--gold)', letterSpacing: 4, marginBottom: 28, textAlign: 'center' },
+  title:        { fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, marginBottom: 6, textAlign: 'center' },
+  sub:          { fontSize: 14, color: 'var(--muted)', marginBottom: 32, textAlign: 'center' },
+  field:        { marginBottom: 18 },
+  label:        { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 },
+  input:        { width: '100%', padding: '11px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 15, background: 'var(--cream)', transition: 'border-color .2s' },
   roleRow:      { display: 'flex', gap: 10 },
-  roleBtn:      { flex: 1, padding: '11px 8px', borderRadius: 10, border: '1.5px solid #e8e8e8', background: '#fff', fontSize: 14, fontWeight: 500, color: '#555' },
-  roleBtnActive:{ border: '1.5px solid #6c47ff', background: '#f0ecff', color: '#6c47ff', fontWeight: 700 },
-  btn:          { width: '100%', marginTop: 8, padding: 13, background: '#6c47ff', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 15 },
-  error:        { background: '#fff0f0', color: '#c00', padding: '10px 14px', borderRadius: 10, marginBottom: 16, fontSize: 14 },
-  footer:       { textAlign: 'center', marginTop: 24, fontSize: 14, color: '#888' },
-  link:         { color: '#6c47ff', fontWeight: 600 },
+  roleBtn:      { flex: 1, padding: '12px 10px', border: '1px solid var(--border)', borderRadius: 10, background: 'var(--cream)', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 3, textAlign: 'left', transition: 'all .2s' },
+  roleBtnActive:{ border: '1.5px solid var(--gold)', background: '#FBF7F0' },
+  roleName:     { fontSize: 14, fontWeight: 700, color: 'var(--ink)' },
+  roleDesc:     { fontSize: 12, color: 'var(--muted)' },
+  btn:          { width: '100%', marginTop: 8, padding: 13, background: 'var(--ink)', color: 'var(--cream)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 15, letterSpacing: '.02em' },
+  error:        { background: '#FEF2F2', color: '#B91C1C', padding: '10px 14px', borderRadius: 8, marginBottom: 18, fontSize: 14 },
+  footer:       { textAlign: 'center', marginTop: 28, fontSize: 14, color: 'var(--muted)' },
+  link:         { color: 'var(--gold-dark)', fontWeight: 600 },
 };

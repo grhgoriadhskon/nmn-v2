@@ -1,22 +1,77 @@
+/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f4f4f8;
-  color: #1a1a2e;
-  line-height: 1.5;
+/* ── Tokens ── */
+:root {
+  --gold:        #C9A96E;
+  --gold-dark:   #A88748;
+  --cream:       #FAF8F5;
+  --cream-dark:  #F0EDE8;
+  --stone:       #EDE8E1;
+  --ink:         #1C1917;
+  --ink-light:   #44403C;
+  --muted:       #78716C;
+  --border:      #E8E2D9;
+  --white:       #FFFFFF;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+
+  --shadow-sm:   0 1px 4px rgba(28,25,23,.06);
+  --shadow-md:   0 4px 16px rgba(28,25,23,.08);
+  --shadow-lg:   0 12px 40px rgba(28,25,23,.10);
+}
+
+/* ── Base ── */
+html, body, #root {
+  min-height: 100vh;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--ink);
+}
+h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 a { color: inherit; text-decoration: none; }
-
-button { font-family: inherit; cursor: pointer; }
-
-input, textarea, select {
-  font-family: inherit;
-  outline: none;
-}
+button { font-family: var(--font-body); cursor: pointer; }
+input, textarea, select { font-family: var(--font-body); outline: none; }
 
 input:focus, textarea:focus, select:focus {
-  border-color: #6c47ff !important;
-  box-shadow: 0 0 0 3px rgba(108,71,255,.12);
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(201,169,110,.15) !important;
+}
+
+/* ── Shared card ── */
+.nmn-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Page wrapper for customer views ── */
+.nmn-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
 }
