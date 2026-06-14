@@ -1,5 +1,22 @@
 import * as bookingsService from './bookings.service.js';
 import { getDb } from '../../db/index.js';
+import { sendBookingStatusUpdate } from '../../services/email.service.js';
+
+function notifyCustomer(booking, status) {
+  const db = getDb();
+  const customer = db.prepare('SELECT email, name FROM users WHERE id = ?').get(booking.customer_id);
+  if (!customer) return;
+  sendBookingStatusUpdate({
+    to:           customer.email,
+    customerName: customer.name,
+    status,
+    serviceName:  booking.service_name,
+    proName:      booking.pro_name,
+    date:         booking.start_at?.slice(0, 10),
+    time:         booking.start_at?.slice(11, 16),
+    reference:    booking.reference,
+  }).catch(() => {});
+}
 
 export function create(req, res, next) {
   try {
@@ -56,6 +73,10 @@ export function cancel(req, res, next) {
       cancelledBy:  req.user.role,
       cancelReason: req.body.reason || null,
     });
+
+    // Notify customer only if the pro cancelled
+    if (isPro) notifyCustomer(updated, 'cancelled');
+
     res.json({ booking: updated });
   } catch (err) { next(err); }
 }
@@ -69,7 +90,9 @@ export function confirm(req, res, next) {
     if (!booking || booking.pro_id !== pro.id) return res.status(404).json({ error: 'Booking not found' });
     if (booking.status !== 'pending') return res.status(400).json({ error: 'Booking is not pending' });
 
-    res.json({ booking: bookingsService.updateBookingStatus(booking.id, 'confirmed') });
+    const updated = bookingsService.updateBookingStatus(booking.id, 'confirmed');
+    notifyCustomer(updated, 'confirmed');
+    res.json({ booking: updated });
   } catch (err) { next(err); }
 }
 
@@ -82,6 +105,8 @@ export function complete(req, res, next) {
     if (!booking || booking.pro_id !== pro.id) return res.status(404).json({ error: 'Booking not found' });
     if (booking.status !== 'confirmed') return res.status(400).json({ error: 'Booking is not confirmed' });
 
-    res.json({ booking: bookingsService.updateBookingStatus(booking.id, 'completed') });
+    const updated = bookingsService.updateBookingStatus(booking.id, 'completed');
+    notifyCustomer(updated, 'completed');
+    res.json({ booking: updated });
   } catch (err) { next(err); }
 }
