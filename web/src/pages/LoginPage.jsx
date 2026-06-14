@@ -33,10 +33,10 @@ export default function LoginPage() {
         {error && <p style={styles.error}>{error}</p>}
 
         <label style={styles.label}>Email</label>
-        <input style={styles.input} type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <input style={styles.input} type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
 
         <label style={styles.label}>Password</label>
-        <input style={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+        <input style={styles.input} type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required />
 
         <button style={styles.btn} type="submit" disabled={loading}>
           {loading ? 'Signing in…' : 'Sign in'}
