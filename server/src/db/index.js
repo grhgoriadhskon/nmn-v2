@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { readFileSync, readdirSync, existsSync } from 'fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { config } from '../config/index.js';
@@ -15,6 +15,10 @@ export function getDb() {
 }
 
 export function initDb() {
+  // Ensure parent directory exists (needed when DB_PATH points to a Railway Volume mount)
+  const dbDir = dirname(config.dbPath);
+  if (dbDir && dbDir !== '.') mkdirSync(dbDir, { recursive: true });
+
   db = new Database(config.dbPath);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
