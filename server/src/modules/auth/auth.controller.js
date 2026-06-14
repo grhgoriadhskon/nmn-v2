@@ -35,6 +35,13 @@ export function login(req, res, next) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Ensure pro profile exists (handles users created before auto-create was added)
+    if (user.role === 'pro') {
+      const db = getDb();
+      const existing = db.prepare('SELECT id FROM professionals WHERE user_id = ?').get(user.id);
+      if (!existing) db.prepare('INSERT INTO professionals (user_id) VALUES (?)').run(user.id);
+    }
+
     const token = authService.signToken(user);
     authService.setAuthCookie(res, token);
 
