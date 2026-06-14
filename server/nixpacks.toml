@@ -1,0 +1,11 @@
+[phases.setup]
+aptPkgs = ["libatomic1", "python3", "make", "g++"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "node src/app.js"
