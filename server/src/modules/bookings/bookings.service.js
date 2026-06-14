@@ -1,4 +1,5 @@
 import { getDb } from '../../db/index.js';
+import { sendBookingConfirmation } from '../../services/email.service.js';
 
 function generateReference() {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -34,7 +35,25 @@ export function createBooking({ customerId, proId, serviceId, startAt, notes }) 
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `).run(reference, customerId, proId, serviceId, startIso, endIso, notes || null);
 
-  return getBookingById(result.lastInsertRowid);
+  const booking = getBookingById(result.lastInsertRowid);
+
+  // Send confirmation email (fire and forget)
+  const customer = db.prepare('SELECT email, name FROM users WHERE id = ?').get(customerId);
+  const proUser  = db.prepare('SELECT u.email FROM users u JOIN professionals p ON p.user_id = u.id WHERE p.id = ?').get(proId);
+  if (customer) {
+    sendBookingConfirmation({
+      to:           customer.email,
+      customerName: customer.name,
+      proName:      booking.pro_name,
+      serviceName:  booking.service_name,
+      date:         startIso.slice(0, 10),
+      time:         startIso.slice(11, 16),
+      reference,
+      price:        service.price,
+    }).catch(() => {});
+  }
+
+  return booking;
 }
 
 export function getBookingById(id) {
