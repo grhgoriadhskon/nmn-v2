@@ -2,18 +2,22 @@ import React from 'react';
 import { Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 
-import LoginPage      from './pages/LoginPage.jsx';
-import RegisterPage   from './pages/RegisterPage.jsx';
-import ProsPage       from './pages/customer/ProsPage.jsx';
-import BookingPage    from './pages/customer/BookingPage.jsx';
-import MyBookingsPage from './pages/customer/MyBookingsPage.jsx';
+import LoginPage            from './pages/LoginPage.jsx';
+import RegisterPage         from './pages/RegisterPage.jsx';
+import ProsPage             from './pages/customer/ProsPage.jsx';
+import BookingPage          from './pages/customer/BookingPage.jsx';
+import MyBookingsPage       from './pages/customer/MyBookingsPage.jsx';
+import ProLayout            from './pages/pro/ProLayout.jsx';
+import ProAgendaPage        from './pages/pro/ProAgendaPage.jsx';
+import ProServicesPage      from './pages/pro/ProServicesPage.jsx';
+import ProWorkingHoursPage  from './pages/pro/ProWorkingHoursPage.jsx';
 
-function Nav() {
+function CustomerNav() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   return (
     <nav style={s.nav}>
-      <span style={s.logo} onClick={() => navigate('/')}>💅 NMN</span>
+      <span style={s.logo} onClick={() => navigate('/pros')}>💅 NMN</span>
       <div style={s.links}>
         <Link style={s.link} to="/pros">Find a pro</Link>
         <Link style={s.link} to="/bookings">My bookings</Link>
@@ -24,16 +28,29 @@ function Nav() {
   );
 }
 
-function PrivateRoute({ children }) {
-  const { status } = useAuth();
+function RequireAuth({ children, role }) {
+  const { status, user } = useAuth();
   if (status === 'loading') return <div style={{ padding: 32 }}>Loading…</div>;
   if (status === 'guest')   return <Navigate to="/login" replace />;
+  if (role && user?.role !== role) return <Navigate to="/" replace />;
+  return children;
+}
+
+function CustomerRoute({ children }) {
   return (
-    <>
-      <Nav />
+    <RequireAuth>
+      <CustomerNav />
       {children}
-    </>
+    </RequireAuth>
   );
+}
+
+function DefaultRedirect() {
+  const { user, status } = useAuth();
+  if (status === 'loading') return <div style={{ padding: 32 }}>Loading…</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === 'pro') return <Navigate to="/pro/agenda" replace />;
+  return <Navigate to="/pros" replace />;
 }
 
 export default function App() {
@@ -41,10 +58,20 @@ export default function App() {
     <Routes>
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/" element={<PrivateRoute><Navigate to="/pros" replace /></PrivateRoute>} />
-      <Route path="/pros"          element={<PrivateRoute><ProsPage /></PrivateRoute>} />
-      <Route path="/pros/:proId"   element={<PrivateRoute><BookingPage /></PrivateRoute>} />
-      <Route path="/bookings"      element={<PrivateRoute><MyBookingsPage /></PrivateRoute>} />
+      <Route path="/" element={<DefaultRedirect />} />
+
+      {/* Customer routes */}
+      <Route path="/pros"        element={<CustomerRoute><ProsPage /></CustomerRoute>} />
+      <Route path="/pros/:proId" element={<CustomerRoute><BookingPage /></CustomerRoute>} />
+      <Route path="/bookings"    element={<CustomerRoute><MyBookingsPage /></CustomerRoute>} />
+
+      {/* Pro routes */}
+      <Route path="/pro" element={<RequireAuth role="pro"><ProLayout /></RequireAuth>}>
+        <Route index element={<Navigate to="/pro/agenda" replace />} />
+        <Route path="agenda"        element={<ProAgendaPage />} />
+        <Route path="services"      element={<ProServicesPage />} />
+        <Route path="working-hours" element={<ProWorkingHoursPage />} />
+      </Route>
     </Routes>
   );
 }
