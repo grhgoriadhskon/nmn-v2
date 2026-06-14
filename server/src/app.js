@@ -15,6 +15,7 @@ import servicesRoutes     from './modules/services/services.routes.js';
 import bookingsRoutes     from './modules/bookings/bookings.routes.js';
 import availabilityRoutes from './modules/availability/availability.routes.js';
 import notificationsRoutes from './modules/notifications/notifications.routes.js';
+import devRoutes           from './modules/dev/dev.routes.js';
 
 initDb();
 
@@ -34,6 +35,7 @@ app.use('/api/services',      servicesRoutes);
 app.use('/api/bookings',      bookingsRoutes);
 app.use('/api/availability',  availabilityRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/dev',          devRoutes);
 
 app.use(errorHandler);
 

@@ -1,4 +1,5 @@
 import * as authService from './auth.service.js';
+import { getDb } from '../../db/index.js';
 
 export function register(req, res, next) {
   try {
@@ -9,6 +10,12 @@ export function register(req, res, next) {
     if (existing) return res.status(409).json({ error: 'Email already in use' });
 
     const user = authService.createUser({ email, password, name, phone, role });
+
+    // Auto-create professional profile when registering as pro
+    if (user.role === 'pro') {
+      getDb().prepare('INSERT INTO professionals (user_id) VALUES (?)').run(user.id);
+    }
+
     const token = authService.signToken(user);
     authService.setAuthCookie(res, token);
 
